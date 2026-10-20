@@ -29,7 +29,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _goNext() async {
     // Короткая пауза, чтобы логотип не «мигал»
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    await Future.wait([
+      Future<void>.delayed(const Duration(milliseconds: 900)),
+      ref.read(authProvider.notifier).ready,
+    ]);
     if (!mounted) return;
     final languageChosen = ref.read(settingsProvider).languageChosen;
     final account = ref.read(authProvider);

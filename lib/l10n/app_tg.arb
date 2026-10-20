@@ -183,6 +183,13 @@
   "noDataYet": "Ҳоло маълумот нест",
   "regionUnknown": "Нишон дода нашудааст",
   "testAllTopics": "Санҷиш аз ҳамаи мавзӯъҳо",
+  "errInvalidCredentials": "Почта ё парол нодуруст",
+  "errNetwork": "Интернет нест. Пайвастшавиро санҷед ва боз кӯшиш кунед.",
+  "errTooMany": "Кӯшишҳо зиёд шуданд. Каме дертар боз кӯшиш кунед.",
+  "resetByEmailHint": "Почтаи ҳисоби худро ворид кунед — ба он пайванд барои иваз кардани парол меояд.",
+  "sendResetLink": "Фиристодани пайванд",
+  "resetEmailSent": "Ба {email} мактуб фиристода шуд. Пайвандро дар мактуб кушоед ва пароли нав гузоред.",
+  "@resetEmailSent": {"placeholders": {"email": {"type": "String"}}},
   "bestResult": "Беҳтарин натиҷа: {percent}%",
   "@bestResult": {
     "placeholders": { "percent": { "type": "int" } }

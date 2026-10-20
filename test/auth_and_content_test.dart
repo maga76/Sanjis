@@ -4,6 +4,7 @@ import 'package:sanjish/app/settings/app_settings.dart';
 import 'package:sanjish/data/content.dart';
 import 'package:sanjish/data/models/question.dart';
 import 'package:sanjish/features/auth/application/auth_service.dart';
+import 'package:sanjish/features/auth/application/local_accounts.dart';
 import 'package:sanjish/features/student/application/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,8 +40,8 @@ void main() {
       expect(c.read(authProvider), isNull);
       expect(
         await auth.login(
-          AuthController.defaultAdminEmail,
-          AuthController.defaultAdminPassword,
+          LocalAccounts.defaultAdminEmail,
+          LocalAccounts.defaultAdminPassword,
         ),
         isNull,
       );
@@ -72,7 +73,10 @@ void main() {
       await _register(c, 'ali@mail.tj');
       await auth.logout();
 
-      expect(await auth.resetPassword('ali@mail.tj', 'newpass'), isNull);
+      expect(
+        await auth.resetPassword('ali@mail.tj', newPassword: 'newpass'),
+        isNull,
+      );
       expect(
         await auth.login('ali@mail.tj', 'secret1'),
         AuthError.wrongPassword,

@@ -272,4 +272,8 @@ String authErrorText(AuthError error, AppLocalizations l10n) => switch (error) {
   AuthError.userNotFound => l10n.errUserNotFound,
   AuthError.wrongPassword => l10n.errWrongPassword,
   AuthError.useGoogle => l10n.errUseGoogle,
+  AuthError.invalidCredentials => l10n.errInvalidCredentials,
+  AuthError.network => l10n.errNetwork,
+  AuthError.tooManyRequests => l10n.errTooMany,
+  AuthError.unknown => l10n.errorGeneric,
 };
