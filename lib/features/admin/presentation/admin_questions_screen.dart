@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/routes.dart';
 import '../../../app/theme/answer_colors.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/utils/subject_style.dart';
+import '../../../data/content.dart';
 import '../../../data/models/question.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
 
-/// Список вопросов (админ): демо-вопросы по предметам и темам.
-/// Создание и редактирование — на этапе 3.
-class AdminQuestionsScreen extends StatelessWidget {
+/// Вопросы (админ): по предметам и темам. Нажатие — редактирование,
+/// «+» — новый вопрос.
+class AdminQuestionsScreen extends ConsumerWidget {
   const AdminQuestionsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final content = ref.watch(contentProvider);
     final subjects = [...defaultSubjects]
       ..sort((a, b) => a.order.compareTo(b.order));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${l10n.questions} · ${demoQuestionsById.length}'),
+        title: Text('${l10n.questions} · ${content.questionsById.length}'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
@@ -57,9 +61,7 @@ class AdminQuestionsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            for (final topic in demoTopics.where(
-              (t) => t.subjectId == subject.id,
-            ))
+            for (final topic in content.topicsOf(subject.id))
               _TopicQuestions(
                 topic: topic,
                 color: subjectColor(context, subject.color),
@@ -67,11 +69,10 @@ class AdminQuestionsScreen extends StatelessWidget {
           ],
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.comingSoon))),
-        child: const Icon(Icons.add_rounded),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(Routes.adminQuestion()),
+        icon: const Icon(Icons.add_rounded),
+        label: Text(l10n.newQuestion),
       ),
     );
   }
@@ -105,6 +106,7 @@ class _TopicQuestions extends StatelessWidget {
           for (final (i, q) in topic.questions.indexed)
             ListTile(
               dense: true,
+              onTap: () => context.push(Routes.adminQuestion(id: q.id)),
               leading: CircleAvatar(
                 radius: 14,
                 backgroundColor: color.withValues(alpha: 0.15),
@@ -126,7 +128,14 @@ class _TopicQuestions extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              trailing: const Icon(Icons.edit_outlined, size: 18),
             ),
+          ListTile(
+            dense: true,
+            leading: Icon(Icons.add_circle_outline_rounded, color: color),
+            title: Text(l10n.newQuestion),
+            onTap: () => context.push(Routes.adminQuestion(topicId: topic.id)),
+          ),
         ],
       ),
     );

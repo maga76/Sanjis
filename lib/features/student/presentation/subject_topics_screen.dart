@@ -9,7 +9,7 @@ import '../../../core/utils/subject_style.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../data/models/question.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
+import '../../../data/content.dart';
 import '../application/progress.dart';
 
 /// Темы предмета в классе и тест по всем темам сразу.
@@ -28,7 +28,7 @@ class SubjectTopicsScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final progress = ref.watch(progressProvider);
     final subject = defaultSubjects.where((s) => s.id == subjectId).firstOrNull;
-    final topics = topicsFor(subjectId, grade);
+    final topics = ref.watch(contentProvider).topicsFor(subjectId, grade);
     final color = parseHexColor(subject?.color ?? '');
     final totalQuestions = topics.fold(0, (sum, t) => sum + t.questions.length);
 

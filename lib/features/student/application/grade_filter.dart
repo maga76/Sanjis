@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Фильтр класса на главной. Меняет только показ предметов,
-/// а не класс в профиле. Пока профиля нет — по умолчанию 5 класс.
+import '../../auth/application/auth_service.dart';
+
+/// Фильтр класса на главной. По умолчанию — класс ученика из профиля,
+/// меняет только показ предметов, а не сам профиль.
 class GradeFilter extends Notifier<int> {
   @override
-  int build() => 5;
+  int build() => ref.watch(authProvider)?.grade ?? 5;
 
   void select(int grade) => state = grade;
 }

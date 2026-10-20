@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/admin/presentation/admin_question_edit_screen.dart';
 import '../features/admin/presentation/admin_questions_screen.dart';
 import '../features/admin/presentation/admin_shell.dart';
 import '../features/admin/presentation/admin_stats_screen.dart';
 import '../features/admin/presentation/admin_subjects_screen.dart';
+import '../features/auth/application/auth_service.dart';
+import '../features/auth/presentation/forgot_password_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/onboarding/presentation/language_select_screen.dart';
 import '../features/onboarding/presentation/splash_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/student/presentation/mistakes_screen.dart';
+import '../features/student/presentation/profile_edit_screen.dart';
 import '../features/student/presentation/profile_screen.dart';
 import '../features/student/presentation/student_home_screen.dart';
 import '../features/student/presentation/student_shell.dart';
@@ -23,11 +27,35 @@ import 'routes.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Роутер приложения. Создаётся один раз.
-/// Проверка входа и роли (redirect) появится на этапе 2.
+/// Без входа пускает только на заставку, выбор языка, вход и регистрацию;
+/// админ-панель — только админу.
 final routerProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: Routes.splash,
+    redirect: (context, state) {
+      const public = {
+        Routes.splash,
+        Routes.language,
+        Routes.login,
+        Routes.register,
+        Routes.forgotPassword,
+      };
+      final location = state.matchedLocation;
+      final account = ref.read(authProvider);
+      if (account == null) {
+        return public.contains(location) ? null : Routes.login;
+      }
+      final home = account.isAdmin ? Routes.adminQuestions : Routes.studentHome;
+      // Вошедшему незачем на экраны входа
+      if (location == Routes.login ||
+          location == Routes.register ||
+          location == Routes.forgotPassword) {
+        return home;
+      }
+      if (location.startsWith('/admin') && !account.isAdmin) return home;
+      return null;
+    },
     routes: [
       GoRoute(
         path: Routes.splash,
@@ -44,6 +72,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.register,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: Routes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: Routes.settings,
@@ -108,6 +140,13 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.studentProfile,
                 builder: (context, state) => const ProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const ProfileEditScreen(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -123,6 +162,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.adminQuestions,
                 builder: (context, state) => const AdminQuestionsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => AdminQuestionEditScreen(
+                      questionId: state.uri.queryParameters['id'],
+                      topicId: state.uri.queryParameters['topic'],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

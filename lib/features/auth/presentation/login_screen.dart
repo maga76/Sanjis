@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +11,7 @@ import '../../../core/widgets/notebook_header.dart';
 import '../../../core/widgets/language_switch.dart';
 import '../application/auth_service.dart';
 
-/// Экран входа. Вход через Google работает через Firebase;
-/// «Войти» по почте пока просто открывает интерфейс ученика (этап 2).
+/// Экран входа: почта и пароль; через Google — если подключён Firebase.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -27,6 +25,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _password = TextEditingController();
   bool _obscure = true;
   bool _googleBusy = false;
+  bool _busy = false;
 
   @override
   void dispose() {
@@ -35,29 +34,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    context.go(Routes.studentHome);
+    setState(() => _busy = true);
+    final auth = ref.read(authProvider.notifier);
+    final error = await auth.login(_email.text, _password.text);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (error != null) {
+      _showError(authErrorText(error, context.l10n));
+      return;
+    }
+    _goHome();
   }
+
+  void _goHome() {
+    final account = ref.read(authProvider);
+    context.go(
+      account?.isAdmin ?? false ? Routes.adminQuestions : Routes.studentHome,
+    );
+  }
+
+  void _showError(String message) => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
 
   Future<void> _signInWithGoogle() async {
     final l10n = context.l10n;
     setState(() => _googleBusy = true);
-    final result = await ref.read(authServiceProvider).signInWithGoogle();
+    final result = await ref.read(authProvider.notifier).signInWithGoogle();
     if (!mounted) return;
     setState(() => _googleBusy = false);
-    final message = switch (result) {
-      GoogleSignInResult.success => null,
-      GoogleSignInResult.canceled => null,
-      GoogleSignInResult.notConfigured => l10n.googleNotConfigured,
-      GoogleSignInResult.failed => l10n.googleSignInFailed,
-    };
-    if (result == GoogleSignInResult.success) {
-      context.go(Routes.studentHome);
-    } else if (message != null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text(message)));
+    switch (result) {
+      case GoogleSignInResult.success:
+        _goHome();
+      case GoogleSignInResult.canceled:
+        break;
+      case GoogleSignInResult.failed:
+        _showError(l10n.googleSignInFailed);
     }
   }
 
@@ -163,41 +177,43 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () =>
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.comingSoon)),
-                              ),
+                          onPressed: () => context.push(Routes.forgotPassword),
                           child: Text(l10n.forgotPassword),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.s),
-                      FilledButton(onPressed: _submit, child: Text(l10n.login)),
-                      const SizedBox(height: AppSpacing.m),
-                      Row(
-                        children: [
-                          const Expanded(child: Divider()),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.s,
+                      FilledButton(
+                        onPressed: _busy ? null : _submit,
+                        child: Text(l10n.login),
+                      ),
+                      if (ref.watch(firebaseReadyProvider)) ...[
+                        const SizedBox(height: AppSpacing.m),
+                        Row(
+                          children: [
+                            const Expanded(child: Divider()),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.s,
+                              ),
+                              child: Text(l10n.orDivider),
                             ),
-                            child: Text(l10n.orDivider),
-                          ),
-                          const Expanded(child: Divider()),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.m),
-                      OutlinedButton.icon(
-                        onPressed: _googleBusy ? null : _signInWithGoogle,
-                        icon: _googleBusy
-                            ? const SizedBox.square(
-                                dimension: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const _GoogleMark(),
-                        label: Text(l10n.signInWithGoogle),
-                      ),
+                            const Expanded(child: Divider()),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.m),
+                        OutlinedButton.icon(
+                          onPressed: _googleBusy ? null : _signInWithGoogle,
+                          icon: _googleBusy
+                              ? const SizedBox.square(
+                                  dimension: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const _GoogleMark(),
+                          label: Text(l10n.signInWithGoogle),
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.m),
                       Wrap(
                         alignment: WrapAlignment.center,
@@ -210,16 +226,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      // Временный вход в админ-панель для проверки этапа 1.
-                      // Только в debug-сборке; уберётся на этапе 2.
-                      if (kDebugMode) ...[
-                        const SizedBox(height: AppSpacing.l),
-                        OutlinedButton.icon(
-                          onPressed: () => context.go(Routes.adminQuestions),
-                          icon: const Icon(Icons.admin_panel_settings_outlined),
-                          label: Text(l10n.debugOpenAdmin),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -259,3 +265,11 @@ class _GoogleMark extends StatelessWidget {
     );
   }
 }
+
+/// Текст ошибки входа или регистрации.
+String authErrorText(AuthError error, AppLocalizations l10n) => switch (error) {
+  AuthError.emailInUse => l10n.errEmailInUse,
+  AuthError.userNotFound => l10n.errUserNotFound,
+  AuthError.wrongPassword => l10n.errWrongPassword,
+  AuthError.useGoogle => l10n.errUseGoogle,
+};

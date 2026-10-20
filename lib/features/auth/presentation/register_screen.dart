@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
@@ -8,17 +9,18 @@ import '../../../core/constants/regions.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/language_switch.dart';
+import '../application/auth_service.dart';
+import 'login_screen.dart';
 
-/// Регистрация ученика. Пока только форма с проверкой полей;
-/// создание аккаунта в Firebase появится на этапе 2.
-class RegisterScreen extends StatefulWidget {
+/// Регистрация ученика: аккаунт создаётся на телефоне, сразу выполняется вход.
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firstName = TextEditingController();
   final _lastName = TextEditingController();
@@ -28,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _school = TextEditingController();
   int? _grade;
   Region? _region;
+  bool _busy = false;
 
   @override
   void dispose() {
@@ -44,8 +47,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    setState(() => _busy = true);
+    final error = await ref
+        .read(authProvider.notifier)
+        .register(
+          firstName: _firstName.text,
+          lastName: _lastName.text,
+          email: _email.text,
+          password: _password.text,
+          grade: _grade!,
+          region: _region!.code,
+          school: _school.text,
+        );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (error != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(authErrorText(error, context.l10n))),
+        );
+      return;
+    }
     context.go(Routes.studentHome);
   }
 
@@ -151,7 +176,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (v) => Validators.required(v, l10n),
                 ),
                 const SizedBox(height: AppSpacing.l),
-                FilledButton(onPressed: _submit, child: Text(l10n.register)),
+                FilledButton(
+                  onPressed: _busy ? null : _submit,
+                  child: Text(l10n.register),
+                ),
                 const SizedBox(height: AppSpacing.s),
                 Wrap(
                   alignment: WrapAlignment.center,

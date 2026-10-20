@@ -6,12 +6,14 @@ class Routes {
   static const language = '/language';
   static const login = '/login';
   static const register = '/register';
+  static const forgotPassword = '/forgot-password';
   static const settings = '/settings';
 
   // Ученик
   static const studentHome = '/student/home';
   static const studentMistakes = '/student/mistakes';
   static const studentProfile = '/student/profile';
+  static const studentProfileEdit = '/student/profile/edit';
 
   /// Классы предмета: `/student/home/subject/math`.
   static const studentSubject = 'subject/:subjectId';
@@ -41,6 +43,12 @@ class Routes {
 
   // Админ
   static const adminQuestions = '/admin/questions';
+
+  /// Редактор вопроса: без id — новый вопрос.
+  static String adminQuestion({String? id, String? topicId}) => Uri(
+    path: '$adminQuestions/edit',
+    queryParameters: {'id': ?id, 'topic': ?topicId},
+  ).toString();
   static const adminSubjects = '/admin/subjects';
   static const adminStats = '/admin/stats';
   static const adminSettings = '/admin/settings';

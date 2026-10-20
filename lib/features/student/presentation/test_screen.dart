@@ -12,7 +12,7 @@ import '../../../core/widgets/state_views.dart';
 import '../../../data/models/attempt.dart';
 import '../../../data/models/question.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
+import '../../../data/content.dart';
 import '../application/grade_filter.dart';
 import '../application/progress.dart';
 
@@ -75,15 +75,17 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     if (widget.mistakes) {
       final ids = ref.read(progressProvider).mistakeIds;
       return [
-        for (final id in ids) ?demoQuestionsById[id],
+        for (final id in ids) ?ref.read(contentProvider).questionsById[id],
       ].take(_maxQuestions).toList();
     }
-    final topic = demoTopicsById[widget.topicId];
+    final content = ref.read(contentProvider);
+    final topic = content.topicsById[widget.topicId];
     if (topic != null) return topic.questions;
 
     final int grade = widget.grade ?? ref.read(gradeFilterProvider);
     final all = [
-      for (final t in topicsFor(widget.subjectId ?? '', grade)) ...t.questions,
+      for (final t in content.topicsFor(widget.subjectId ?? '', grade))
+        ...t.questions,
     ]..shuffle(_random);
     return all.take(_maxQuestions).toList();
   }
@@ -98,12 +100,15 @@ class _TestScreenState extends ConsumerState<TestScreen> {
 
   String get _subjectId => widget.mistakes
       ? kMistakesSubjectId
-      : widget.subjectId ?? demoTopicsById[widget.topicId]?.subjectId ?? '';
+      : widget.subjectId ??
+            ref.read(contentProvider).topicsById[widget.topicId]?.subjectId ??
+            '';
 
   String _title(BuildContext context) {
     final l10n = context.l10n;
     if (widget.mistakes) return l10n.workOnMistakes;
-    if (demoTopicsById[widget.topicId] case final topic?) {
+    if (ref.read(contentProvider).topicsById[widget.topicId]
+        case final topic?) {
       return context.pickLang(topic.nameTg, topic.nameRu);
     }
     final subject = defaultSubjects

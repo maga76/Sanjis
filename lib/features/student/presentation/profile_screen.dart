@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
 import '../../../app/theme/app_theme.dart';
+import '../../../core/constants/regions.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../../core/utils/subject_style.dart';
@@ -11,14 +12,13 @@ import '../../../core/widgets/flag_stripe.dart';
 import '../../../core/widgets/notebook_header.dart';
 import '../../../data/models/attempt.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
+import '../../../data/content.dart';
 import '../../auth/application/auth_service.dart';
 import '../application/grade_filter.dart';
 import '../application/progress.dart';
 import 'widgets/header_stat.dart';
 
-/// Профиль ученика. Имя пока заглушка (появится на этапе 2),
-/// статистика и последние результаты — из локально сохранённых тестов.
+/// Профиль ученика: данные аккаунта, статистика и последние результаты.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -27,9 +27,15 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final name =
-        ref.watch(authUserProvider).value?.displayName?.split(' ').first ??
-        l10n.studentDefaultName;
+    final account = ref.watch(authProvider);
+    final name = (account?.fullName.isNotEmpty ?? false)
+        ? account!.fullName
+        : l10n.studentDefaultName;
+    final region = Region.fromCode(account?.region);
+    final details = [
+      ?account?.school,
+      if (region != null) region.label(l10n),
+    ].where((s) => s.isNotEmpty).join(' · ');
     final grade = ref.watch(gradeFilterProvider);
     final progress = ref.watch(progressProvider);
     final lastAttempts = progress.attempts.take(10).toList();
@@ -49,13 +55,27 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 Align(
                   alignment: Alignment.centerRight,
-                  child: IconButton(
-                    tooltip: l10n.settings,
-                    onPressed: () => context.push(Routes.settings),
-                    icon: const Icon(
-                      Icons.settings_rounded,
-                      color: Colors.white,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: l10n.editProfile,
+                        onPressed: () =>
+                            context.push(Routes.studentProfileEdit),
+                        icon: const Icon(
+                          Icons.edit_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: l10n.settings,
+                        onPressed: () => context.push(Routes.settings),
+                        icon: const Icon(
+                          Icons.settings_rounded,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Container(
@@ -87,11 +107,19 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  l10n.gradeN(grade),
+                  l10n.gradeN(account?.grade ?? grade),
                   style: textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.85),
                   ),
                 ),
+                if (details.isNotEmpty)
+                  Text(
+                    details,
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.75),
+                    ),
+                  ),
                 const SizedBox(height: AppSpacing.m),
                 const FlagStripe(width: 56, height: 6, radius: 3),
                 const SizedBox(height: AppSpacing.l),
@@ -171,20 +199,18 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () => context.push(Routes.settings),
                   ),
                 ),
-                if (ref.watch(authUserProvider).value != null) ...[
-                  const SizedBox(height: AppSpacing.s),
-                  Card(
-                    clipBehavior: Clip.antiAlias,
-                    child: ListTile(
-                      leading: Icon(Icons.logout_rounded, color: scheme.error),
-                      title: Text(l10n.logout),
-                      onTap: () async {
-                        await ref.read(authServiceProvider).signOut();
-                        if (context.mounted) context.go(Routes.login);
-                      },
-                    ),
+                const SizedBox(height: AppSpacing.s),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: ListTile(
+                    leading: Icon(Icons.logout_rounded, color: scheme.error),
+                    title: Text(l10n.logout),
+                    onTap: () async {
+                      await ref.read(authProvider.notifier).logout();
+                      if (context.mounted) context.go(Routes.login);
+                    },
                   ),
-                ],
+                ),
               ],
             ),
           ),
@@ -195,20 +221,20 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 /// Строка последнего результата: оценка, предмет, тема, дата и процент.
-class _AttemptTile extends StatelessWidget {
+class _AttemptTile extends ConsumerWidget {
   const _AttemptTile({required this.attempt});
 
   final Attempt attempt;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final subject = defaultSubjects
         .where((s) => s.id == attempt.subjectId)
         .firstOrNull;
-    final topic = demoTopicsById[attempt.topicId];
+    final topic = ref.watch(contentProvider).topicsById[attempt.topicId];
     final color = subject == null
         ? scheme.primary
         : subjectColor(context, subject.color);

@@ -9,7 +9,7 @@ import '../../../core/utils/subject_style.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../data/models/subject.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
+import '../../../data/content.dart';
 import '../application/grade_filter.dart';
 
 /// Предмет: выбор класса. Дальше — темы этого класса и тест.
@@ -96,7 +96,7 @@ class SubjectScreen extends ConsumerWidget {
   }
 }
 
-class _GradeCard extends StatelessWidget {
+class _GradeCard extends ConsumerWidget {
   const _GradeCard({
     required this.subject,
     required this.grade,
@@ -110,12 +110,12 @@ class _GradeCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final color = subjectColor(context, subject.color);
-    final topics = topicsFor(subject.id, grade);
+    final topics = ref.watch(contentProvider).topicsFor(subject.id, grade);
     final questions = topics.fold(0, (sum, t) => sum + t.questions.length);
 
     return Material(

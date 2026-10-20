@@ -11,8 +11,8 @@ import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/notebook_header.dart';
 import '../../auth/application/auth_service.dart';
 
-/// Заставка: логотип на синем фоне, загрузка языка, затем переход дальше.
-/// На этапе 2 здесь добавится проверка входа и роли (ученик / админ).
+/// Заставка: логотип на синем фоне, затем выбор языка, вход
+/// или сразу главная (ученика или админа), если уже вошли.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -32,13 +32,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
     final languageChosen = ref.read(settingsProvider).languageChosen;
-    final signedIn = ref.read(authServiceProvider).currentUser != null;
+    final account = ref.read(authProvider);
     context.go(
       !languageChosen
           ? Routes.language
-          : signedIn
-          ? Routes.studentHome
-          : Routes.login,
+          : account == null
+          ? Routes.login
+          : account.isAdmin
+          ? Routes.adminQuestions
+          : Routes.studentHome,
     );
   }
 

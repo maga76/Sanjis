@@ -14,7 +14,6 @@ import '../application/grade_filter.dart';
 import 'widgets/subject_card.dart';
 
 /// Главная ученика: приветствие, выбор класса, сетка предметов.
-/// Пока предметы берутся из демо-списка; на этапе 4 — из Firestore.
 /// Нажатие на предмет открывает его темы.
 class StudentHomeScreen extends ConsumerWidget {
   const StudentHomeScreen({super.key});
@@ -93,9 +92,8 @@ class _HomeHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final name =
-        ref.watch(authUserProvider).value?.displayName?.split(' ').first ??
-        l10n.studentDefaultName;
+    final firstName = ref.watch(authProvider)?.firstName ?? '';
+    final name = firstName.isEmpty ? l10n.studentDefaultName : firstName;
 
     return NotebookHeader(
       padding: const EdgeInsets.fromLTRB(

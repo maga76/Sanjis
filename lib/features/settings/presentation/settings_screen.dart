@@ -7,6 +7,7 @@ import '../../../app/routes.dart';
 import '../../../app/settings/app_settings.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/l10n/l10n.dart';
+import '../../auth/application/auth_service.dart';
 
 /// Версия приложения из сборки (pubspec.yaml → version).
 final appVersionProvider = FutureProvider<String>((ref) async {
@@ -99,8 +100,10 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
           OutlinedButton.icon(
-            // На этапе 2 здесь будет выход из Firebase Auth
-            onPressed: () => context.go(Routes.login),
+            onPressed: () async {
+              await ref.read(authProvider.notifier).logout();
+              if (context.mounted) context.go(Routes.login);
+            },
             icon: const Icon(Icons.logout_rounded),
             label: Text(l10n.logout),
           ),

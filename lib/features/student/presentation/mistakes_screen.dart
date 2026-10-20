@@ -10,7 +10,7 @@ import '../../../core/utils/subject_style.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../data/models/question.dart';
 import '../../../data/seed/default_subjects.dart';
-import '../../../data/seed/demo_questions.dart';
+import '../../../data/content.dart';
 import '../application/progress.dart';
 
 /// Работа над ошибками: вопросы с неправильными ответами и тест по ним.
@@ -21,9 +21,10 @@ class MistakesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final content = ref.watch(contentProvider);
     final questions = [
       for (final id in ref.watch(progressProvider).mistakeIds)
-        ?demoQuestionsById[id],
+        ?content.questionsById[id],
     ];
 
     return Scaffold(
@@ -55,16 +56,16 @@ class MistakesScreen extends ConsumerWidget {
   }
 }
 
-class _MistakeCard extends StatelessWidget {
+class _MistakeCard extends ConsumerWidget {
   const _MistakeCard({required this.question});
 
   final Question question;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final topic = demoTopicsById[question.topicId];
+    final topic = ref.watch(contentProvider).topicsById[question.topicId];
     final subject = defaultSubjects
         .where((s) => s.id == topic?.subjectId)
         .firstOrNull;
