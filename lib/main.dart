@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,13 @@ Future<void> main() async {
   var firebaseReady = false;
   try {
     await Firebase.initializeApp();
+    // Копия базы на телефоне: без интернета всё открывается и сохраняется,
+    // а при появлении сети досылается. Размер не ограничиваем, чтобы
+    // вопросы и результаты не вытеснялись из кеша.
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
     firebaseReady = true;
   } on Object catch (e) {
     debugPrint('Firebase не настроен: $e');
