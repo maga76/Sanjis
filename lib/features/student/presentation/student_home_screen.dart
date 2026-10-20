@@ -9,6 +9,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/notebook_header.dart';
 import '../../../core/widgets/state_views.dart';
 import '../../../data/seed/default_subjects.dart';
+import '../../auth/application/auth_service.dart';
 import '../application/grade_filter.dart';
 import 'widgets/subject_card.dart';
 
@@ -92,7 +93,9 @@ class _HomeHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
-    final name = l10n.studentDefaultName;
+    final name =
+        ref.watch(authUserProvider).value?.displayName?.split(' ').first ??
+        l10n.studentDefaultName;
 
     return NotebookHeader(
       padding: const EdgeInsets.fromLTRB(

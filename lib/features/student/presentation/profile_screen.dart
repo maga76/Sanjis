@@ -12,6 +12,7 @@ import '../../../core/widgets/notebook_header.dart';
 import '../../../data/models/attempt.dart';
 import '../../../data/seed/default_subjects.dart';
 import '../../../data/seed/demo_questions.dart';
+import '../../auth/application/auth_service.dart';
 import '../application/grade_filter.dart';
 import '../application/progress.dart';
 import 'widgets/header_stat.dart';
@@ -26,7 +27,9 @@ class ProfileScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final name = l10n.studentDefaultName;
+    final name =
+        ref.watch(authUserProvider).value?.displayName?.split(' ').first ??
+        l10n.studentDefaultName;
     final grade = ref.watch(gradeFilterProvider);
     final progress = ref.watch(progressProvider);
     final lastAttempts = progress.attempts.take(10).toList();
@@ -168,6 +171,20 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () => context.push(Routes.settings),
                   ),
                 ),
+                if (ref.watch(authUserProvider).value != null) ...[
+                  const SizedBox(height: AppSpacing.s),
+                  Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: ListTile(
+                      leading: Icon(Icons.logout_rounded, color: scheme.error),
+                      title: Text(l10n.logout),
+                      onTap: () async {
+                        await ref.read(authServiceProvider).signOut();
+                        if (context.mounted) context.go(Routes.login);
+                      },
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

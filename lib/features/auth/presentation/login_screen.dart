@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/routes.dart';
@@ -9,21 +10,23 @@ import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/notebook_header.dart';
 import '../../../core/widgets/language_switch.dart';
+import '../application/auth_service.dart';
 
-/// Экран входа. Пока без Firebase: кнопка «Войти» просто открывает
-/// интерфейс ученика. Настоящий вход появится на этапе 2.
-class LoginScreen extends StatefulWidget {
+/// Экран входа. Вход через Google работает через Firebase;
+/// «Войти» по почте пока просто открывает интерфейс ученика (этап 2).
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _obscure = true;
+  bool _googleBusy = false;
 
   @override
   void dispose() {
@@ -35,6 +38,27 @@ class _LoginScreenState extends State<LoginScreen> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.go(Routes.studentHome);
+  }
+
+  Future<void> _signInWithGoogle() async {
+    final l10n = context.l10n;
+    setState(() => _googleBusy = true);
+    final result = await ref.read(authServiceProvider).signInWithGoogle();
+    if (!mounted) return;
+    setState(() => _googleBusy = false);
+    final message = switch (result) {
+      GoogleSignInResult.success => null,
+      GoogleSignInResult.canceled => null,
+      GoogleSignInResult.notConfigured => l10n.googleNotConfigured,
+      GoogleSignInResult.failed => l10n.googleSignInFailed,
+    };
+    if (result == GoogleSignInResult.success) {
+      context.go(Routes.studentHome);
+    } else if (message != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
   }
 
   @override
@@ -149,6 +173,32 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: AppSpacing.s),
                       FilledButton(onPressed: _submit, child: Text(l10n.login)),
                       const SizedBox(height: AppSpacing.m),
+                      Row(
+                        children: [
+                          const Expanded(child: Divider()),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.s,
+                            ),
+                            child: Text(l10n.orDivider),
+                          ),
+                          const Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.m),
+                      OutlinedButton.icon(
+                        onPressed: _googleBusy ? null : _signInWithGoogle,
+                        icon: _googleBusy
+                            ? const SizedBox.square(
+                                dimension: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const _GoogleMark(),
+                        label: Text(l10n.signInWithGoogle),
+                      ),
+                      const SizedBox(height: AppSpacing.m),
                       Wrap(
                         alignment: WrapAlignment.center,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -176,6 +226,34 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Буква «G» в цветах Google вместо картинки-ассета.
+class _GoogleMark extends StatelessWidget {
+  const _GoogleMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) => const SweepGradient(
+        colors: [
+          Color(0xFF4285F4),
+          Color(0xFF34A853),
+          Color(0xFFFBBC05),
+          Color(0xFFEA4335),
+          Color(0xFF4285F4),
+        ],
+      ).createShader(bounds),
+      child: const Text(
+        'G',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w900,
+          color: Colors.white,
         ),
       ),
     );

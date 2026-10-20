@@ -141,6 +141,10 @@
   "@topicsCount": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "signInWithGoogle": "Ворид шудан бо Google",
+  "orDivider": "ё",
+  "googleNotConfigured": "Вуруд бо Google ҳоло танзим нашудааст",
+  "googleSignInFailed": "Бо Google ворид шудан нашуд. Боз кӯшиш кунед.",
   "bestResult": "Беҳтарин натиҷа: {percent}%",
   "@bestResult": {
     "placeholders": { "percent": { "type": "int" } }

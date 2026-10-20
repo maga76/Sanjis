@@ -4,6 +4,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase подключается, только когда положен google-services.json
+// (см. docs/GOOGLE_SIGN_IN.md). Без него приложение собирается как раньше.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "tj.sanjish"
     compileSdk = flutter.compileSdkVersion

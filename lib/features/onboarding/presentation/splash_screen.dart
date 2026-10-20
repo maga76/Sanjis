@@ -9,6 +9,7 @@ import '../../../app/theme/app_theme.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/widgets/app_logo.dart';
 import '../../../core/widgets/notebook_header.dart';
+import '../../auth/application/auth_service.dart';
 
 /// Заставка: логотип на синем фоне, загрузка языка, затем переход дальше.
 /// На этапе 2 здесь добавится проверка входа и роли (ученик / админ).
@@ -31,7 +32,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
     final languageChosen = ref.read(settingsProvider).languageChosen;
-    context.go(languageChosen ? Routes.login : Routes.language);
+    final signedIn = ref.read(authServiceProvider).currentUser != null;
+    context.go(
+      !languageChosen
+          ? Routes.language
+          : signedIn
+          ? Routes.studentHome
+          : Routes.login,
+    );
   }
 
   @override

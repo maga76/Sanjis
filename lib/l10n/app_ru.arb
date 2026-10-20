@@ -105,6 +105,10 @@
   "exitTestBody": "Результат этого теста не сохранится.",
   "exitTest": "Прервать",
   "topicsCount": "Тем: {count}",
+  "signInWithGoogle": "Войти через Google",
+  "orDivider": "или",
+  "googleNotConfigured": "Вход через Google ещё не настроен",
+  "googleSignInFailed": "Не удалось войти через Google. Попробуйте ещё раз.",
   "bestResult": "Лучший результат: {percent}%",
 
   "regionDushanbe": "Душанбе",
