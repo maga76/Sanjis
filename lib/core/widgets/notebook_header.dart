@@ -9,11 +9,15 @@ class NotebookHeader extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.fromLTRB(16, 8, 16, 24),
     this.rounded = true,
+    this.background,
   });
 
   final Widget child;
   final EdgeInsets padding;
   final bool rounded;
+
+  /// Цвет листа; по умолчанию — синие чернила [color].
+  final Color? background;
 
   /// Цвет «листа» — школьные синие чернила.
   static Color color(BuildContext context) =>
@@ -28,7 +32,7 @@ class NotebookHeader extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: color(context),
+          color: background ?? color(context),
           borderRadius: rounded
               ? const BorderRadius.vertical(bottom: Radius.circular(24))
               : null,

@@ -36,6 +36,25 @@ class Content {
   ];
 }
 
+/// Последняя ошибка записи в базу — админ-панель показывает её.
+final syncErrorProvider = NotifierProvider<SyncError, SyncFailure?>(
+  SyncError.new,
+);
+
+enum SyncFailure { noAccess, network }
+
+class SyncError extends Notifier<SyncFailure?> {
+  @override
+  SyncFailure? build() => null;
+
+  void report(Object error) =>
+      state = error is FirebaseException && error.code == 'permission-denied'
+      ? SyncFailure.noAccess
+      : SyncFailure.network;
+
+  void clear() => state = null;
+}
+
 final contentProvider = NotifierProvider<ContentController, Content>(
   ContentController.new,
 );
@@ -76,34 +95,62 @@ class ContentController extends Notifier<Content> {
   }
 
   void _listen() {
-    StreamSubscription<QuerySnapshot<Map<String, dynamic>>> watch(
+    final subscriptions = <String, StreamSubscription<Object?>>{};
+    final retries = <Timer>[];
+    var disposed = false;
+
+    // После ошибки (нет доступа, нет сети) подписка закрывается —
+    // переподключаемся через 15 секунд
+    void watch(
       String collection,
       void Function(List<QueryDocumentSnapshot<Map<String, dynamic>>>) apply,
-    ) => _db.collection(collection).snapshots().listen((snapshot) {
-      apply(snapshot.docs);
-      state = _merge();
-    }, onError: (Object e) => debugPrint('$collection: $e'));
+    ) {
+      subscriptions[collection] = _db
+          .collection(collection)
+          .snapshots()
+          .listen(
+            (snapshot) {
+              apply(snapshot.docs);
+              state = _merge();
+            },
+            onError: (Object e) {
+              debugPrint('$collection: $e');
+              if (disposed) return;
+              retries.add(
+                Timer(const Duration(seconds: 15), () {
+                  if (!disposed) watch(collection, apply);
+                }),
+              );
+            },
+          );
+    }
 
-    final subscriptions = [
-      watch('topics', (docs) {
-        _customTopics = [for (final d in docs) Topic.fromJson(d.data())];
-      }),
-      watch('questions', (docs) {
-        _customQuestions = [for (final d in docs) Question.fromJson(d.data())];
-      }),
-      watch('deleted', (docs) => _deleted = {for (final d in docs) d.id}),
-    ];
+    watch('topics', (docs) {
+      _customTopics = [for (final d in docs) Topic.fromJson(d.data())];
+    });
+    watch('questions', (docs) {
+      _customQuestions = [for (final d in docs) Question.fromJson(d.data())];
+    });
+    watch('deleted', (docs) => _deleted = {for (final d in docs) d.id});
+
     ref.onDispose(() {
-      for (final s in subscriptions) {
+      disposed = true;
+      for (final s in subscriptions.values) {
         s.cancel();
+      }
+      for (final t in retries) {
+        t.cancel();
       }
     });
   }
 
   /// Без await: без интернета Firestore отправит изменения позже,
-  /// а на экране они видны сразу.
+  /// а на экране они видны сразу. Если база отказала — сообщаем админу.
   void _commit(WriteBatch batch) => unawaited(
-    batch.commit().catchError((Object e) => debugPrint('Контент: $e')),
+    batch.commit().catchError((Object e) {
+      debugPrint('Контент: $e');
+      ref.read(syncErrorProvider.notifier).report(e);
+    }),
   );
 
   static List<T> _decode<T>(

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,8 +27,11 @@ class AdminStatsScreen extends ConsumerWidget {
           onRefresh: () => ref.refresh(adminStatsProvider.future),
           child: _StatsBody(data: value),
         ),
-        AsyncError() => ErrorView(
-          message: l10n.errNetwork,
+        AsyncError(:final error) => ErrorView(
+          message:
+              error is FirebaseException && error.code == 'permission-denied'
+              ? l10n.errNoAccess
+              : l10n.errNetwork,
           onRetry: () => ref.invalidate(adminStatsProvider),
         ),
         _ => const LoadingSkeleton(),

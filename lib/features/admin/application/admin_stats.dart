@@ -27,7 +27,10 @@ class AdminStatsData {
 final adminStatsProvider = FutureProvider.autoDispose<AdminStatsData>((
   ref,
 ) async {
-  final accounts = await ref.read(authProvider.notifier).allAccounts();
+  final accounts = await ref
+      .read(authProvider.notifier)
+      .allAccounts()
+      .timeout(const Duration(seconds: 20));
   final students = [
     for (final a in accounts)
       if (!a.isAdmin) a,
@@ -35,8 +38,12 @@ final adminStatsProvider = FutureProvider.autoDispose<AdminStatsData>((
 
   if (ref.watch(firebaseReadyProvider)) {
     final db = FirebaseFirestore.instance;
-    final attempts = await db.collectionGroup('attempts').get();
-    final stats = await db.collection('questionStats').get();
+    const timeout = Duration(seconds: 20);
+    final attempts = await db
+        .collectionGroup('attempts')
+        .get()
+        .timeout(timeout);
+    final stats = await db.collection('questionStats').get().timeout(timeout);
     return AdminStatsData(
       students: students,
       attempts: [for (final d in attempts.docs) Attempt.fromJson(d.data())],

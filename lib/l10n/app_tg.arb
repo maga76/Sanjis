@@ -190,6 +190,9 @@
   "sendResetLink": "Фиристодани пайванд",
   "resetEmailSent": "Ба {email} мактуб фиристода шуд. Пайвандро дар мактуб кушоед ва пароли нав гузоред.",
   "@resetEmailSent": {"placeholders": {"email": {"type": "String"}}},
+  "errNoAccess": "Ба база дастрасӣ нест. Қоидаҳои Firestore-ро санҷед (Rules → Publish).",
+  "topicsDone": "Супорида шуд: {done} аз {total} мавзӯъ",
+  "@topicsDone": {"placeholders": {"done": {"type": "int"}, "total": {"type": "int"}}},
   "bestResult": "Беҳтарин натиҷа: {percent}%",
   "@bestResult": {
     "placeholders": { "percent": { "type": "int" } }

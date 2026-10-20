@@ -154,6 +154,8 @@
   "resetByEmailHint": "Введите почту аккаунта — на неё придёт ссылка для смены пароля.",
   "sendResetLink": "Отправить ссылку",
   "resetEmailSent": "Письмо отправлено на {email}. Откройте ссылку в письме и задайте новый пароль.",
+  "errNoAccess": "Нет доступа к базе. Проверьте правила Firestore (Rules → Publish).",
+  "topicsDone": "Пройдено тем: {done} из {total}",
   "bestResult": "Лучший результат: {percent}%",
 
   "regionDushanbe": "Душанбе",

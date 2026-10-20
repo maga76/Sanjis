@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/l10n.dart';
+import '../../../data/content.dart';
 
 /// Каркас админ-панели: Вопросы, Предметы, Статистика, Настройки.
-class AdminShell extends StatelessWidget {
+class AdminShell extends ConsumerWidget {
   const AdminShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    ref.listen(syncErrorProvider, (_, failure) {
+      if (failure == null) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 6),
+            content: Text(
+              failure == SyncFailure.noAccess
+                  ? l10n.errNoAccess
+                  : l10n.errNetwork,
+            ),
+          ),
+        );
+      ref.read(syncErrorProvider.notifier).clear();
+    });
     return Scaffold(
       body: shell,
       bottomNavigationBar: NavigationBar(
