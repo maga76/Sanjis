@@ -114,11 +114,10 @@
   "noMistakesTitle": "Хато нест — офарин!",
   "noMistakesHint": "Саволҳое, ки ба онҳо нодуруст ҷавоб медиҳед, дар ин ҷо ҷамъ мешаванд",
 
-  "questionsCount": "Саволҳо: {count}",
+  "questionsCount": "{count} савол",
   "@questionsCount": {
     "placeholders": { "count": { "type": "int" } }
   },
-  "allTopicsHint": "Саволҳо аз ҳамаи мавзӯъҳои синф",
   "noTopicsForGrade": "Барои ин синф ҳоло мавзӯъ нест",
   "explanation": "Шарҳ",
   "markN": "Баҳо: {mark}",
@@ -137,10 +136,6 @@
   "exitTestTitle": "Санҷишро қатъ мекунед?",
   "exitTestBody": "Натиҷаи ин санҷиш нигоҳ дошта намешавад.",
   "exitTest": "Қатъ кардан",
-  "topicsCount": "Мавзӯъҳо: {count}",
-  "@topicsCount": {
-    "placeholders": { "count": { "type": "int" } }
-  },
   "signInWithGoogle": "Ворид шудан бо Google",
   "orDivider": "ё",
   "googleSignInFailed": "Бо Google ворид шудан нашуд. Боз кӯшиш кунед.",
@@ -187,6 +182,7 @@
   "@wrongRate": {"placeholders": {"percent": {"type": "int"}, "count": {"type": "int"}}},
   "noDataYet": "Ҳоло маълумот нест",
   "regionUnknown": "Нишон дода нашудааст",
+  "testAllTopics": "Санҷиш аз ҳамаи мавзӯъҳо",
   "bestResult": "Беҳтарин натиҷа: {percent}%",
   "@bestResult": {
     "placeholders": { "percent": { "type": "int" } }

@@ -15,14 +15,9 @@ class Routes {
   static const studentProfile = '/student/profile';
   static const studentProfileEdit = '/student/profile/edit';
 
-  /// Классы предмета: `/student/home/subject/math`.
+  /// Темы предмета для класса ученика: `/student/home/subject/math`.
   static const studentSubject = 'subject/:subjectId';
   static String subject(String subjectId) => '$studentHome/subject/$subjectId';
-
-  /// Темы предмета в классе: `/student/home/subject/math/grade/5`.
-  static const studentSubjectGrade = 'grade/:grade';
-  static String subjectGrade(String subjectId, int grade) =>
-      '${subject(subjectId)}/grade/$grade';
 
   /// Тест: по теме, по всем темам предмета или по ошибкам.
   static const test = '/test';

@@ -19,7 +19,6 @@ import '../features/student/presentation/profile_edit_screen.dart';
 import '../features/student/presentation/profile_screen.dart';
 import '../features/student/presentation/student_home_screen.dart';
 import '../features/student/presentation/student_shell.dart';
-import '../features/student/presentation/subject_screen.dart';
 import '../features/student/presentation/subject_topics_screen.dart';
 import '../features/student/presentation/test_screen.dart';
 import 'routes.dart';
@@ -109,19 +108,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                 routes: [
                   GoRoute(
                     path: Routes.studentSubject,
-                    builder: (context, state) => SubjectScreen(
+                    builder: (context, state) => SubjectTopicsScreen(
                       subjectId: state.pathParameters['subjectId']!,
                     ),
-                    routes: [
-                      GoRoute(
-                        path: Routes.studentSubjectGrade,
-                        builder: (context, state) => SubjectTopicsScreen(
-                          subjectId: state.pathParameters['subjectId']!,
-                          grade:
-                              int.tryParse(state.pathParameters['grade']!) ?? 1,
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),

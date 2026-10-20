@@ -90,8 +90,7 @@
   "noMistakesTitle": "Ошибок нет — молодец!",
   "noMistakesHint": "Здесь будут собираться вопросы, на которые вы ответили неправильно",
 
-  "questionsCount": "Вопросов: {count}",
-  "allTopicsHint": "Вопросы из всех тем класса",
+  "questionsCount": "{count, plural, one{{count} вопрос} few{{count} вопроса} other{{count} вопросов}}",
   "noTopicsForGrade": "Для этого класса пока нет тем",
   "explanation": "Объяснение",
   "markN": "Оценка: {mark}",
@@ -104,7 +103,6 @@
   "exitTestTitle": "Прервать тест?",
   "exitTestBody": "Результат этого теста не сохранится.",
   "exitTest": "Прервать",
-  "topicsCount": "Тем: {count}",
   "signInWithGoogle": "Войти через Google",
   "orDivider": "или",
   "googleSignInFailed": "Не удалось войти через Google. Попробуйте ещё раз.",
@@ -149,6 +147,7 @@
   "wrongRate": "Ошибок: {percent}% из {count} ответов",
   "noDataYet": "Пока нет данных",
   "regionUnknown": "Не указан",
+  "testAllTopics": "Тест по всем темам",
   "bestResult": "Лучший результат: {percent}%",
 
   "regionDushanbe": "Душанбе",
