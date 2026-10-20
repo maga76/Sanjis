@@ -1,0 +1,159 @@
+{
+  "@@locale": "tg",
+
+  "appName": "Sanjish",
+  "appTagline": "Санҷиши дониш барои мактаббачагон",
+
+  "subjects": "Фанҳо",
+  "grade": "Синф",
+  "gradeN": "Синфи {grade}",
+  "@gradeN": {
+    "placeholders": { "grade": { "type": "Object" } }
+  },
+  "topics": "Мавзӯъҳо",
+  "allTopics": "Ҳамаи мавзӯъҳо",
+  "startTest": "Оғози санҷиш",
+  "next": "Навбатӣ",
+  "correct": "Дуруст!",
+  "wrong": "Нодуруст",
+  "result": "Натиҷа",
+  "mistakes": "Хатоҳо",
+  "workOnMistakes": "Кор бо хатоҳо",
+  "tryAgain": "Боз як бор",
+  "toHome": "Ба асосӣ",
+  "profile": "Профил",
+  "settings": "Танзимот",
+  "language": "Забон",
+  "login": "Ворид шудан",
+  "register": "Бақайдгирӣ",
+  "logout": "Баромадан",
+  "email": "Почтаи электронӣ",
+  "password": "Парол",
+  "repeatPassword": "Паролро такрор кунед",
+  "forgotPassword": "Паролро фаромӯш кардед?",
+  "firstName": "Ном",
+  "lastName": "Насаб",
+  "school": "Мактаб",
+  "region": "Минтақа",
+  "hello": "Салом, {name}!",
+  "@hello": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "questionOf": "Савол {current} аз {total}",
+  "@questionOf": {
+    "placeholders": {
+      "current": { "type": "Object" },
+      "total": { "type": "Object" }
+    }
+  },
+  "scoreOf": "{correct} аз {total}",
+  "@scoreOf": {
+    "placeholders": {
+      "correct": { "type": "Object" },
+      "total": { "type": "Object" }
+    }
+  },
+  "noInternet": "Интернет нест",
+  "retry": "Такрор",
+  "empty": "Ҳоло ин ҷо холӣ аст",
+  "save": "Нигоҳ доштан",
+  "delete": "Нест кардан",
+  "cancel": "Бекор кардан",
+
+  "home": "Асосӣ",
+  "questions": "Саволҳо",
+  "statistics": "Омор",
+  "adminPanel": "Панели админ",
+  "studentDefaultName": "Хонанда",
+
+  "chooseLanguage": "Забонро интихоб кунед",
+  "langTajik": "Тоҷикӣ",
+  "langRussian": "Русский",
+  "langTgShort": "ТҶ",
+  "langRuShort": "РУ",
+  "continueButton": "Давом додан",
+
+  "theme": "Намуди зоҳирӣ",
+  "themeLight": "Равшан",
+  "themeDark": "Торик",
+  "themeSystem": "Мисли система",
+  "fontSize": "Андозаи ҳарф",
+  "fontNormal": "Муқаррарӣ",
+  "fontLarge": "Калон",
+  "appVersion": "Версияи барнома",
+
+  "noAccount": "Ҳисоб надоред?",
+  "haveAccount": "Ҳисоб доред?",
+  "parentsEmailHint": "Агар почта надоред, почтаи волидонро истифода баред",
+  "fieldRequired": "Ин майдонро пур кунед",
+  "invalidEmail": "Почтаи нодуруст",
+  "passwordTooShort": "Парол бояд на камтар аз 6 аломат бошад",
+  "passwordsDontMatch": "Паролҳо мувофиқат намекунанд",
+
+  "loading": "Боркунӣ...",
+  "errorGeneric": "Хатогӣ рух дод",
+  "comingSoon": "Ин бахш дар марҳилаҳои навбатӣ илова мешавад",
+  "debugOpenAdmin": "Панели админ (барои санҷиш)",
+
+  "homeSubtitle": "Имрӯз чӣ меомӯзем?",
+  "chooseGrade": "Синфро интихоб кунед",
+  "gradeRange": "Синфҳои {from}–{to}",
+  "@gradeRange": {
+    "placeholders": {
+      "from": { "type": "Object" },
+      "to": { "type": "Object" }
+    }
+  },
+  "statTests": "Санҷишҳо",
+  "statAnswers": "Ҷавобҳо",
+  "statAccuracy": "Дурустӣ",
+  "welcomeBack": "Хуш омадед!",
+  "loginSubtitle": "Барои давом додан ворид шавед",
+  "lastResults": "Натиҷаҳои охирин",
+  "noResultsYet": "Шумо ҳоло ягон санҷиш насупоридаед",
+  "noMistakesTitle": "Хато нест — офарин!",
+  "noMistakesHint": "Саволҳое, ки ба онҳо нодуруст ҷавоб медиҳед, дар ин ҷо ҷамъ мешаванд",
+
+  "questionsCount": "Саволҳо: {count}",
+  "@questionsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "allTopicsHint": "Саволҳо аз ҳамаи мавзӯъҳои синф",
+  "noTopicsForGrade": "Барои ин синф ҳоло мавзӯъ нест",
+  "explanation": "Шарҳ",
+  "markN": "Баҳо: {mark}",
+  "@markN": {
+    "placeholders": { "mark": { "type": "int" } }
+  },
+  "markMessage5": "Аъло! Офарин!",
+  "markMessage4": "Хуб! Боз каме машқ кунед.",
+  "markMessage3": "Бад нест, вале мавзӯъро такрор кунед.",
+  "markMessage2": "Мавзӯъро аз нав омӯзед ва боз кӯшиш кунед.",
+  "correctAnswerIs": "Ҷавоби дуруст: {answer}",
+  "@correctAnswerIs": {
+    "placeholders": { "answer": { "type": "String" } }
+  },
+  "startMistakesTest": "Санҷиш аз рӯи хатоҳо",
+  "exitTestTitle": "Санҷишро қатъ мекунед?",
+  "exitTestBody": "Натиҷаи ин санҷиш нигоҳ дошта намешавад.",
+  "exitTest": "Қатъ кардан",
+  "topicsCount": "Мавзӯъҳо: {count}",
+  "@topicsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bestResult": "Беҳтарин натиҷа: {percent}%",
+  "@bestResult": {
+    "placeholders": { "percent": { "type": "int" } }
+  },
+
+  "regionDushanbe": "Душанбе",
+  "regionSughd": "вилояти Суғд",
+  "regionKhatlon": "вилояти Хатлон",
+  "regionGbao": "ВМКБ",
+  "regionNrs": "НТҶ (ноҳияҳои тобеи ҷумҳурӣ)",
+
+  "monthsGenitive": "январи,феврали,марти,апрели,майи,июни,июли,августи,сентябри,октябри,ноябри,декабри",
+  "@monthsGenitive": {
+    "description": "Номи 12 моҳ барои сана (масалан «15 октябри 2026»), бо вергул ҷудо карда шудаанд"
+  }
+}
