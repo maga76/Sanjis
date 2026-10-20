@@ -128,11 +128,21 @@ class FirebaseAccounts implements AccountsBackend {
   }
 
   Future<Account> _loadOrCreate(User user, {String? fallbackName}) async {
-    final doc = await _users.doc(user.uid).get();
-    final data = doc.data();
-    return data != null
-        ? _fromData(user.uid, data, verified: user.emailVerified)
-        : _createProfile(user, fallbackName: fallbackName);
+    try {
+      final doc = await _users.doc(user.uid).get();
+      final data = doc.data();
+      return data != null
+          ? _fromData(user.uid, data, verified: user.emailVerified)
+          : await _createProfile(user, fallbackName: fallbackName);
+    } on FirebaseException catch (e) {
+      // База недоступна (нет сети или прав) — вход всё равно состоялся,
+      // профиль подтянется, когда база ответит
+      debugPrint('Профиль: ${e.code} ${e.message}');
+      return _fromData(user.uid, {
+        'email': user.email ?? '',
+        'firstName': (user.displayName ?? fallbackName ?? '').split(' ').first,
+      }, verified: user.emailVerified);
+    }
   }
 
   @override
