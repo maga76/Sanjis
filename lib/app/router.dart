@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/admin/presentation/admin_import_screen.dart';
 import '../features/admin/presentation/admin_question_edit_screen.dart';
 import '../features/admin/presentation/admin_questions_screen.dart';
 import '../features/admin/presentation/admin_shell.dart';
@@ -152,6 +153,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: Routes.adminQuestions,
                 builder: (context, state) => const AdminQuestionsScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'import',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => const AdminImportScreen(),
+                  ),
                   GoRoute(
                     path: 'edit',
                     parentNavigatorKey: _rootNavigatorKey,

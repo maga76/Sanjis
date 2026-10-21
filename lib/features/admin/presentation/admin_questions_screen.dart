@@ -26,6 +26,14 @@ class AdminQuestionsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('${l10n.questions} · ${content.questionsById.length}'),
+        actions: [
+          TextButton.icon(
+            onPressed: () => context.push(Routes.adminImport),
+            icon: const Icon(Icons.post_add_rounded),
+            label: Text(l10n.importShort),
+          ),
+          const SizedBox(width: AppSpacing.s),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(

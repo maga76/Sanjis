@@ -195,8 +195,12 @@ class ContentController extends Notifier<Content> {
     ]);
   }
 
+  static var _idCounter = 0;
+
+  /// Уникальный id: время + счётчик (при импорте вопросы создаются
+  /// в одну и ту же микросекунду).
   static String newId(String prefix) =>
-      '$prefix.${DateTime.now().microsecondsSinceEpoch}';
+      '$prefix.${DateTime.now().microsecondsSinceEpoch}${_idCounter++}';
 
   Future<void> saveQuestion(Question question) async {
     if (_online) {
@@ -211,6 +215,25 @@ class ContentController extends Notifier<Content> {
       for (final q in _customQuestions)
         if (q.id != question.id) q,
       question,
+    ];
+    await _save();
+  }
+
+  /// Добавляет сразу много вопросов (импорт) — одной записью.
+  Future<void> saveQuestions(List<Question> questions) async {
+    if (questions.isEmpty) return;
+    if (_online) {
+      final batch = _db.batch();
+      for (final q in questions) {
+        batch.set(_db.collection('questions').doc(q.id), q.toJson());
+      }
+      return _commit(batch);
+    }
+    final ids = {for (final q in questions) q.id};
+    _customQuestions = [
+      for (final q in _customQuestions)
+        if (!ids.contains(q.id)) q,
+      ...questions,
     ];
     await _save();
   }

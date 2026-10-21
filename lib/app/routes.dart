@@ -38,6 +38,7 @@ class Routes {
 
   // Админ
   static const adminQuestions = '/admin/questions';
+  static const adminImport = '/admin/questions/import';
 
   /// Редактор вопроса: без id — новый вопрос.
   static String adminQuestion({String? id, String? topicId}) => Uri(
