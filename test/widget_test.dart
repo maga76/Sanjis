@@ -7,6 +7,10 @@ import 'package:sanjish/core/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _pumpApp(WidgetTester tester, Map<String, Object> prefs) async {
+  // Экран телефона (на широком экране приложение рисуется «телефоном»)
+  tester.view.physicalSize = const Size(1080, 2340);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
   SharedPreferences.setMockInitialValues(prefs);
   final instance = await SharedPreferences.getInstance();
   await tester.pumpWidget(

@@ -1,7 +1,8 @@
 // Генерирует иконки Android из логотипа приложения (SanjishLogoPainter).
 // Запуск из корня проекта:
 //   flutter test tool/generate_icons.dart
-// Результат: android/app/src/main/res/mipmap-*/ и build/icon_preview.png.
+// Результат: android/app/src/main/res/mipmap-*/, web/favicon.png, web/icons/
+// и build/icon_preview.png.
 
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -52,6 +53,25 @@ void main() {
           '$dir/ic_launcher_foreground.png',
           (108 * k).round(),
           const SanjishLogoPainter(drawBackground: false, contentScale: 0.62),
+        );
+      }
+      // Веб: вкладка браузера и иконка «на главный экран»
+      await _render(
+        'web/favicon.png',
+        64,
+        const SanjishLogoPainter(cornerRadius: 0.24),
+      );
+      for (final size in [192, 512]) {
+        await _render(
+          'web/icons/Icon-$size.png',
+          size,
+          const SanjishLogoPainter(inset: 0.04, cornerRadius: 0.24),
+        );
+        // Маскируемая: фон на весь квадрат, рисунок в безопасной зоне
+        await _render(
+          'web/icons/Icon-maskable-$size.png',
+          size,
+          const SanjishLogoPainter(cornerRadius: 0, contentScale: 0.8),
         );
       }
       await _render('build/icon_preview.png', 512, const SanjishLogoPainter());

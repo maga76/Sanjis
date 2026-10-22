@@ -218,6 +218,7 @@ class FirebaseAccounts implements AccountsBackend {
 
   @override
   Future<GoogleSignInResult> signInWithGoogle() async {
+    if (kIsWeb) return _signInWithGoogleWeb();
     try {
       final google = GoogleSignIn.instance;
       if (!_googleInitialized) {
@@ -250,9 +251,25 @@ class FirebaseAccounts implements AccountsBackend {
     }
   }
 
+  /// В браузере — окно входа Google от Firebase.
+  Future<GoogleSignInResult> _signInWithGoogleWeb() async {
+    try {
+      final credential = await _auth.signInWithPopup(GoogleAuthProvider());
+      _emit(await _loadOrCreate(credential.user!));
+      return GoogleSignInResult.success;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'popup-closed-by-user' ||
+          e.code == 'cancelled-popup-request') {
+        return GoogleSignInResult.canceled;
+      }
+      debugPrint('Google (веб): ${e.code} ${e.message}');
+      return GoogleSignInResult.failed;
+    }
+  }
+
   @override
   Future<void> logout() async {
-    if (_googleInitialized) await GoogleSignIn.instance.signOut();
+    if (!kIsWeb && _googleInitialized) await GoogleSignIn.instance.signOut();
     await _auth.signOut();
     _emit(null);
   }

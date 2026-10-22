@@ -26,8 +26,9 @@ class SanjishApp extends ConsumerWidget {
       supportedLocales: kSupportedLocales,
       localizationsDelegates: kLocalizationsDelegates,
       routerConfig: router,
-      builder: (context, child) =>
-          _TextScaleWrapper(largeFont: settings.largeFont, child: child!),
+      builder: (context, child) => _PhoneFrame(
+        child: _TextScaleWrapper(largeFont: settings.largeFont, child: child!),
+      ),
     );
   }
 }
@@ -50,6 +51,56 @@ class _TextScaleWrapper extends StatelessWidget {
     return MediaQuery(
       data: mq.copyWith(textScaler: scaler),
       child: child,
+    );
+  }
+}
+
+/// На широком экране (браузер на компьютере) приложение показывается
+/// «телефоном» по центру, а не растягивается на весь монитор.
+class _PhoneFrame extends StatelessWidget {
+  const _PhoneFrame({required this.child});
+
+  final Widget child;
+
+  static const _width = 420.0;
+  static const _maxHeight = 900.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    if (mq.size.width < 600) return child;
+
+    final height = (mq.size.height - 48).clamp(560.0, _maxHeight);
+    return ColoredBox(
+      color: const Color(0xFF0F2A4D),
+      child: Center(
+        child: Container(
+          width: _width,
+          height: height,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0xFF2C4A75), width: 6),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x66000000),
+                blurRadius: 40,
+                offset: Offset(0, 16),
+              ),
+            ],
+          ),
+          // Внутри всё считает, что экран — размером с телефон
+          child: MediaQuery(
+            data: mq.copyWith(
+              size: Size(_width - 12, height - 12),
+              padding: EdgeInsets.zero,
+              viewPadding: EdgeInsets.zero,
+              viewInsets: EdgeInsets.zero,
+            ),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 }
