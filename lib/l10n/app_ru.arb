@@ -172,6 +172,7 @@
   "importNoAnswer": "Правильный ответ не отмечен — нажмите на правильный вариант",
   "importAdd": "Добавить: {count}",
   "importDone": "{count, plural, one{Добавлен {count} вопрос} few{Добавлено {count} вопроса} other{Добавлено {count} вопросов}}",
+  "illustrationsCredit": "Иллюстрации: Twemoji, CC-BY 4.0",
   "bestResult": "Лучший результат: {percent}%",
 
   "regionDushanbe": "Душанбе",

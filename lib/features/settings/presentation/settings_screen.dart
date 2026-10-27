@@ -110,7 +110,8 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.l),
           Center(
             child: Text(
-              '${l10n.appVersion}: $version',
+              '${l10n.appVersion}: $version\n${l10n.illustrationsCredit}',
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/utils/subject_style.dart';
-import '../../../../core/widgets/subject_doodles.dart';
+import '../../../../core/widgets/subject_pictures.dart';
 import '../../../../data/models/subject.dart';
 
 /// Предмет в виде обложки школьной тетради: цветная обложка,
@@ -42,51 +42,45 @@ class SubjectCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           splashColor: Colors.white.withValues(alpha: 0.2),
-          child: Stack(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Рисунки предмета «мелом» — под названием и иконкой
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(painter: SubjectDoodles(subject.id)),
-                ),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Корешок
-                  Container(width: 10, color: spine),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Icon(
-                              subjectIcon(subject.icon),
-                              color: Colors.white.withValues(alpha: 0.9),
-                              size: 30,
+              // Корешок
+              Container(width: 10, color: spine),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Картинки занимают свободное место над наклейкой
+                      // (с двухстрочным названием или крупным шрифтом — меньше)
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, box) => Align(
+                            alignment: Alignment.topLeft,
+                            child: SubjectPictures(
+                              subjectId: subject.id,
+                              height: (box.maxHeight - 6).clamp(0, 64),
                             ),
                           ),
-                          const Spacer(),
-                          _Label(name: name, ink: spine),
-                          const SizedBox(height: 10),
-                          Text(
-                            context.l10n.gradeRange(
-                              subject.minGrade,
-                              subject.maxGrade,
-                            ),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      _Label(name: name, ink: spine),
+                      const SizedBox(height: 10),
+                      Text(
+                        context.l10n.gradeRange(
+                          subject.minGrade,
+                          subject.maxGrade,
+                        ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ],
           ),

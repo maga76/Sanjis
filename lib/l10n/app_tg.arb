@@ -212,6 +212,7 @@
   "@importAdd": {"placeholders": {"count": {"type": "int"}}},
   "importDone": "Илова шуд: {count} савол",
   "@importDone": {"placeholders": {"count": {"type": "int"}}},
+  "illustrationsCredit": "Тасвирҳо: Twemoji, CC-BY 4.0",
   "bestResult": "Беҳтарин натиҷа: {percent}%",
   "@bestResult": {
     "placeholders": { "percent": { "type": "int" } }
