@@ -30,9 +30,10 @@ dependencies:
   crypto: ^3.0.7
   cloud_firestore: ^7.0.0
   firebase_ai: ^5.0.0
-  flutter_svg: ^2.3.0
 
 dev_dependencies:
+  # Только для tool/rasterize_subject_pictures.dart (SVG → PNG)
+  flutter_svg: ^2.3.0
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

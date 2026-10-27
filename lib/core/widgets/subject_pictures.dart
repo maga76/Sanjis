@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 /// Картинки предмета на обложке, как наклейки на тетради: одна крупная
-/// и две поменьше. Иллюстрации — Twemoji (CC-BY 4.0), лежат
-/// в `assets/subjects/` под кодами символов Unicode.
+/// и две поменьше. Иллюстрации — Twemoji (CC-BY 4.0): PNG в
+/// `assets/subjects/` под кодами символов Unicode (исходные SVG —
+/// в tool/subject_svgs/, перевод — tool/rasterize_subject_pictures.dart).
 class SubjectPictures extends StatelessWidget {
   const SubjectPictures({super.key, required this.subjectId, this.height = 64});
 
@@ -37,10 +37,17 @@ class SubjectPictures extends StatelessWidget {
 
     Widget picture(String code, double size, double angle) => Transform.rotate(
       angle: angle,
-      child: SvgPicture.asset(
-        'assets/subjects/$code.svg',
+      child: Image.asset(
+        'assets/subjects/$code.png',
         width: size,
         height: size,
+        filterQuality: FilterQuality.medium,
+        // Плавное появление, пока картинка декодируется в фоне
+        frameBuilder: (context, child, frame, sync) => AnimatedOpacity(
+          opacity: sync || frame != null ? 1 : 0,
+          duration: const Duration(milliseconds: 150),
+          child: child,
+        ),
       ),
     );
 

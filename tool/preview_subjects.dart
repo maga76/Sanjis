@@ -65,8 +65,10 @@ void main() {
         ),
       ),
     );
-    // SVG-картинки грузятся асинхронно
-    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
+    // Картинки декодируются асинхронно
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(seconds: 2)),
+    );
     await tester.pumpAndSettle();
     await tester.runAsync(() async {
       final boundary =
