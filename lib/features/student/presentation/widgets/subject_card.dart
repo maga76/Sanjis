@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/l10n.dart';
 import '../../../../core/utils/subject_style.dart';
+import '../../../../core/widgets/subject_doodles.dart';
 import '../../../../data/models/subject.dart';
 
 /// Предмет в виде обложки школьной тетради: цветная обложка,
@@ -41,41 +42,51 @@ class SubjectCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           splashColor: Colors.white.withValues(alpha: 0.2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Stack(
             children: [
-              // Корешок
-              Container(width: 10, color: spine),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Icon(
-                          subjectIcon(subject.icon),
-                          color: Colors.white.withValues(alpha: 0.9),
-                          size: 30,
-                        ),
-                      ),
-                      const Spacer(),
-                      _Label(name: name, ink: spine),
-                      const SizedBox(height: 10),
-                      Text(
-                        context.l10n.gradeRange(
-                          subject.minGrade,
-                          subject.maxGrade,
-                        ),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              // Рисунки предмета «мелом» — под названием и иконкой
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(painter: SubjectDoodles(subject.id)),
                 ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Корешок
+                  Container(width: 10, color: spine),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Icon(
+                              subjectIcon(subject.icon),
+                              color: Colors.white.withValues(alpha: 0.9),
+                              size: 30,
+                            ),
+                          ),
+                          const Spacer(),
+                          _Label(name: name, ink: spine),
+                          const SizedBox(height: 10),
+                          Text(
+                            context.l10n.gradeRange(
+                              subject.minGrade,
+                              subject.maxGrade,
+                            ),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -94,6 +105,11 @@ class _Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.titleSmall?.copyWith(
+      color: const Color(0xFF1A1D21),
+      fontWeight: FontWeight.w700,
+      height: 1.2,
+    );
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
       decoration: BoxDecoration(
@@ -103,16 +119,21 @@ class _Label extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: const Color(0xFF1A1D21),
-              fontWeight: FontWeight.w700,
-              height: 1.2,
+          // Одно длинное слово («Информатика») не переносим посреди слова,
+          // а чуть уменьшаем; несколько слов переносятся на две строки
+          if (name.contains(' '))
+            Text(
+              name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: style,
+            )
+          else
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(name, maxLines: 1, style: style),
             ),
-          ),
           const SizedBox(height: 6),
           Container(height: 1.5, color: ink.withValues(alpha: 0.25)),
         ],
